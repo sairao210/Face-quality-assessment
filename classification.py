@@ -33,16 +33,26 @@ x = tf.placeholder("float", [None, n_input])
 y = tf.placeholder("float", [None, n_classes])
 
 weights = {
-    'h1': tf.Variable(w[()]['encoder_h1']),
-    'h2': tf.Variable(w[()]['encoder_h2']),
+    'h1': tf.constant(w[()]['encoder_h1']),
+    'h2': tf.constant(w[()]['encoder_h2']),
     'out': tf.Variable(tf.random_normal([n_hidden_2, n_classes]))
 }
 biases = {
-    'b1': tf.Variable(b[()]['encoder_b1']),
-    'b2': tf.Variable(b[()]['encoder_b2']),
+    'b1': tf.constant(b[()]['encoder_b1']),
+    'b2': tf.constant(b[()]['encoder_b2']),
     'out': tf.Variable(tf.random_normal([n_classes]))
 }
 
+# weights = {
+#     'h1': tf.Variable(tf.random_normal([n_input, n_hidden_1])),
+#     'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),
+#     'out': tf.Variable(tf.random_normal([n_hidden_2, n_classes]))
+# }
+# biases = {
+#     'b1': tf.Variable(tf.random_normal([n_hidden_1])),
+#     'b2': tf.Variable(tf.random_normal([n_hidden_2])),
+#     'out': tf.Variable(tf.random_normal([n_classes]))
+# }
 
 # Create model
 def multilayer_perceptron(x, weights, biases):
@@ -69,7 +79,7 @@ Nbatch = int(Tsize/Bsize)
 if Tsize/(Bsize*1.0) != Nbatch:
     Nbatch = Nbatch + 1
 print 'Total Number of Batches:',Nbatch
-nEpochs = 30
+nEpochs = 1000
 
 with tf.Session() as sess:
     sess.run(init)
@@ -99,3 +109,7 @@ with tf.Session() as sess:
     correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
     print("Accuracy:", sess.run(accuracy, feed_dict = {x: x_test, y: lab_test}))
+
+    w,b = sess.run([weights, biases])
+np.save('Data/classification-weights.npy',w)
+np.save('Data/classification-biases.npy',b)

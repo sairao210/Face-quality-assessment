@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import sys
 
 print 'Loading Data....'
-x_train = np.load('Data/x_train.npy')
-x_test = np.load('Data/x_test.npy')
+x_train = np.load('Data/enc_x_train.npy')
 x_train = np.squeeze(x_train)
 # print len(x_train)
 # sys.exit()
@@ -18,9 +17,9 @@ training_epochs = 20
 
 
 # Network Parameters
+n_input = 256
 n_hidden_1 = 128
 n_hidden_2 = 50
-n_input = 256
 
 # tf Graph input
 X = tf.placeholder("float", [None, n_input])
@@ -76,12 +75,13 @@ Nbatch = int(Tsize/Bsize)
 if Tsize/(Bsize*1.0) != Nbatch:
     Nbatch = Nbatch + 1
 print 'Total Number of Batches:',Nbatch
-nEpochs = 30
+nEpochs = 1000
 
 with tf.Session() as sess:
     sess.run(init)
     for epoch in range(nEpochs):
         print "Epoch:",epoch+1,
+        avg_cost = 0.
         for i in range(Nbatch):
             if(i+1 == Nbatch):
                 a = (i)*Bsize+1
@@ -94,7 +94,8 @@ with tf.Session() as sess:
             batch_x = x_train[a:b]
             # print np.shape(x_train),np.shape(batch_x)
             _, c = sess.run([optimizer, cost], feed_dict={X: batch_x})
-        print "cost:",c
+            avg_cost = avg_cost + c
+        print "cost:",avg_cost/(Nbatch*1.0)
     print("Optimization Finished!")
     w,b = sess.run([weights, biases])
 np.save('Data/ae-weights.npy',w)
